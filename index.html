@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telecom Registration - Quick Helping Partner</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-800 flex flex-col justify-between p-3 sm:p-6">
+
+  <header class="max-w-3xl w-full mx-auto mb-4 text-center">
+    <div class="inline-flex items-center space-x-2 bg-indigo-900/50 border border-indigo-700/50 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-semibold mb-2 backdrop-blur-sm">
+      <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      <span>Telecom Partner Portal</span>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Quick Helping Partner Registration</h1>
+    <p class="text-slate-400 text-xs sm:text-sm mt-1">Complete your registration in 3 simple steps</p>
+
+    <!-- Step Progress Bar -->
+    <div class="mt-6 max-w-md mx-auto px-4">
+      <div class="flex items-center justify-between relative">
+        <!-- Connecting Line -->
+        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-800 rounded -z-0"></div>
+        <div id="progressLine" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-indigo-500 rounded transition-all duration-500 w-0 -z-0"></div>
+
+        <!-- Step 1 Dot -->
+        <div id="stepDot1" class="relative z-10 w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">
+          1
+        </div>
+        <!-- Step 2 Dot -->
+        <div id="stepDot2" class="relative z-10 w-9 h-9 rounded-full bg-slate-800 text-slate-400 font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">
+          2
+        </div>
+        <!-- Step 3 Dot -->
+        <div id="stepDot3" class="relative z-10 w-9 h-9 rounded-full bg-slate-800 text-slate-400 font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">
+          3
+        </div>
+      </div>
+      <div class="flex justify-between text-[11px] font-medium text-slate-400 mt-2 px-1">
+        <span>Account OTP</span>
+        <span>Partner Details</span>
+        <span>Payment</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-2xl w-full mx-auto my-auto">
+    <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-5 sm:p-8">
+      
+      <!-- Custom Alert Banner -->
+      <div id="alertBox" class="hidden mb-6 p-4 rounded-xl text-sm font-medium transition-all flex items-start space-x-3">
+        <span id="alertIcon" class="text-lg"></span>
+        <div id="alertMsg" class="flex-1"></div>
+      </div>
+
+      <!-- ================= PAGE 1 ================= -->
+      <section id="page1" class="space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Step 1: Account & Email Verification</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Enter your details to receive an OTP on your email.</p>
+        </div>
+        
+        <!-- Details Form -->
+        <div id="p1-details-step" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Full Name *</label>
+            <input type="text" id="p1-name" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="e.g. Satya Kumar" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number *</label>
+            <input type="tel" id="p1-phone" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="e.g. 9876543210" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Address *</label>
+            <input type="email" id="p1-email" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="name@example.com" required>
+          </div>
+          <button id="sendOtpBtn" onclick="handleSendOTP()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200">
+            Send OTP to Email
+          </button>
+        </div>
+
+        <!-- OTP & Password Verification Box -->
+        <div id="p1-otp-step" class="space-y-4 hidden border-t border-slate-200 pt-5">
+          <div class="bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl text-xs text-indigo-800 flex items-center space-x-2">
+            <svg class="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>An OTP has been sent to your email. Please enter it below along with your account password.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Enter OTP Code *</label>
+            <input type="text" id="p1-otp-input" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 tracking-widest text-center text-xl font-bold text-indigo-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="123456" maxlength="6">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Set Account Password *</label>
+            <input type="password" id="p1-password" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Minimum 6 characters" minlength="6">
+          </div>
+          <button id="verifyOtpBtn" onclick="handleVerifyAndRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-200">
+            Verify OTP & Set Password
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= PAGE 2 ================= -->
+      <section id="page2" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Step 2: Partner Profile Details</h2>
+          <p class="text-xs sm:text-sm text-slate-500">All fields are mandatory. Please complete all details.</p>
+        </div>
+
+        <form id="profileForm" onsubmit="handleProfileSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Full Name *</label>
+            <input type="text" id="p2-fullname" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Age *</label>
+            <input type="number" id="p2-age" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" min="18" placeholder="e.g. 24" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number *</label>
+            <input type="tel" id="p2-phone" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Address *</label>
+            <input type="email" id="p2-email" class="w-full bg-slate-200/70 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-600 font-medium cursor-not-allowed outline-none" readonly required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Birth *</label>
+            <input type="date" id="p2-dob" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Inter Pass Year *</label>
+            <input type="number" id="p2-interyear" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g. 2022" min="1990" max="2026" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">City *</label>
+            <input type="text" id="p2-city" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="City name" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">District *</label>
+            <input type="text" id="p2-district" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="District" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">State *</label>
+            <input type="text" id="p2-state" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="State" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Pin Code *</label>
+            <input type="text" id="p2-pincode" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="6-digit PIN code" pattern="[0-9]{6}" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Upload Resume *</label>
+            <input type="file" id="p2-resume" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer" accept=".pdf,.doc,.docx" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Inter Certificate *</label>
+            <input type="file" id="p2-certificate" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer" accept=".pdf,.png,.jpeg,.jpg" required>
+          </div>
+
+          <div class="md:col-span-2 pt-3">
+            <button type="submit" id="submitProfileBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200">
+              Submit Details & Continue
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ================= PAGE 3 ================= -->
+      <section id="page3" class="space-y-6 hidden text-center">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Step 3: Registration Fee Payment</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Scan the QR code using any UPI application to complete payment.</p>
+        </div>
+
+        <div class="flex justify-center my-6">
+          <div class="p-4 bg-white border-2 border-indigo-100 rounded-2xl shadow-xl inline-block relative group">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+              Official Scanner
+            </div>
+            <!-- Payment Scanner QR Image -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=quickhelpingpartner@upi&pn=TelecomQHP&mc=0000&mode=02" alt="Payment QR Scanner" class="w-52 h-52 rounded-lg object-contain">
+            <div class="mt-2 text-xs font-bold text-slate-700">Telecom Quick Helping Partner</div>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 text-left flex items-start space-x-2">
+          <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <span>Payment verification takes up to 24 hours. Keep a screenshot of your transaction reference for verification.</span>
+        </div>
+
+        <div>
+          <!-- Disabled Non-Functional Submit Button as requested -->
+          <button disabled class="w-full bg-slate-200 text-slate-400 font-semibold py-3.5 rounded-xl cursor-not-allowed border border-slate-300/80 shadow-none">
+            Submit Payment (Disabled)
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="max-w-2xl w-full mx-auto text-center text-xs text-slate-400 mt-6">
+    © 2026 Telecom Quick Helping Partner. All rights reserved.
+  </footer>
+
+  <!-- Firebase Modular JS SDK v10 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // Provided Firebase Credentials
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuzGDHhswMaDnRCbIySk5xrCl8o8mlGLw",
+      authDomain: "telecom-aace9.firebaseapp.com",
+      projectId: "telecom-aace9",
+      storageBucket: "telecom-aace9.firebasestorage.app",
+      messagingSenderId: "443593352045",
+      appId: "1:443593352045:web:2ea6d21fcc722562b8f064",
+      measurementId: "G-CPGWZXSLTQ"
+    };
+
+    // Initialize Firebase Services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Provided EmailJS Credentials
+    const EMAILJS_PUBLIC_KEY = "6OYyhfesYKGExGDPb";
+    const EMAILJS_SERVICE_ID = "service_qh1c06y";
+    const EMAILJS_TEMPLATE_ID = "template_judy2gg";
+
+    // Initialize EmailJS
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
+    // App State Variables
+    let generatedOTP = null;
+    let currentUserUid = null;
+
+    // Helper: Display Alert Banner
+    function showAlert(msg, isError = false) {
+      const alertBox = document.getElementById("alertBox");
+      const alertMsg = document.getElementById("alertMsg");
+      const alertIcon = document.getElementById("alertIcon");
+      
+      alertMsg.textContent = msg;
+      if (isError) {
+        alertIcon.textContent = "⚠️";
+        alertBox.className = "mb-6 p-4 rounded-xl text-sm font-medium bg-red-50 border border-red-200 text-red-800 flex items-start space-x-3";
+      } else {
+        alertIcon.textContent = "✅";
+        alertBox.className = "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-start space-x-3";
+      }
+      alertBox.classList.remove("hidden");
+    }
+
+    function hideAlert() {
+      document.getElementById("alertBox").classList.add("hidden");
+    }
+
+    // Helper: Update Progress Dots
+    function setStep(stepNumber) {
+      hideAlert();
+      const line = document.getElementById("progressLine");
+      const dot1 = document.getElementById("stepDot1");
+      const dot2 = document.getElementById("stepDot2");
+      const dot3 = document.getElementById("stepDot3");
+
+      if (stepNumber === 1) {
+        line.style.width = "0%";
+      } else if (stepNumber === 2) {
+        line.style.width = "50%";
+        dot2.className = "relative z-10 w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300";
+      } else if (stepNumber === 3) {
+        line.style.width = "100%";
+        dot3.className = "relative z-10 w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300";
+      }
+    }
+
+    // PAGE 1: Send OTP Handler
+    window.handleSendOTP = function() {
+      const name = document.getElementById("p1-name").value.trim();
+      const phone = document.getElementById("p1-phone").value.trim();
+      const email = document.getElementById("p1-email").value.trim();
+
+      if (!name || !phone || !email) {
+        showAlert("Please enter your name, phone number, and email address.", true);
+        return;
+      }
+
+      // Generate 6-digit random numeric OTP
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const btn = document.getElementById("sendOtpBtn");
+      btn.innerText = "Sending OTP...";
+      btn.disabled = true;
+
+      // Exact template parameter keys matching EmailJS template {{email}} and {{otp}}
+      const templateParams = {
+        email: email,
+        to_name: name,
+        otp: generatedOTP
+      };
+
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then(() => {
+          showAlert("OTP has been sent successfully to " + email);
+          document.getElementById("p1-details-step").classList.add("hidden");
+          document.getElementById("p1-otp-step").classList.remove("hidden");
+        })
+        .catch((err) => {
+          console.error("EmailJS Error:", err);
+          showAlert("Failed to send OTP email: " + (err.text || JSON.stringify(err)), true);
+          btn.innerText = "Send OTP to Email";
+          btn.disabled = false;
+        });
+    };
+
+    // PAGE 1: Verify OTP and Register Account
+    window.handleVerifyAndRegister = async function() {
+      const userOtp = document.getElementById("p1-otp-input").value.trim();
+      const password = document.getElementById("p1-password").value;
+      const email = document.getElementById("p1-email").value.trim();
+      const name = document.getElementById("p1-name").value.trim();
+      const phone = document.getElementById("p1-phone").value.trim();
+
+      if (userOtp !== generatedOTP) {
+        showAlert("Invalid OTP code. Please verify the code sent to your email.", true);
+        return;
+      }
+
+      if (!password || password.length < 6) {
+        showAlert("Please enter a password with at least 6 characters.", true);
+        return;
+      }
+
+      const btn = document.getElementById("verifyOtpBtn");
+      btn.innerText = "Creating Account...";
+      btn.disabled = true;
+
+      try {
+        // Create User Account with Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        currentUserUid = userCredential.user.uid;
+
+        showAlert("Account registered successfully! Please fill in your partner profile.");
+
+        // Pre-fill Page 2 fields from Page 1 inputs
+        document.getElementById("p2-fullname").value = name;
+        document.getElementById("p2-phone").value = phone;
+        document.getElementById("p2-email").value = email;
+
+        // Switch to Page 2
+        setStep(2);
+        document.getElementById("page1").classList.add("hidden");
+        document.getElementById("page2").classList.remove("hidden");
+
+      } catch (err) {
+        console.error("Firebase Auth Error:", err);
+        showAlert("Account creation failed: " + err.message, true);
+        btn.innerText = "Verify OTP & Set Password";
+        btn.disabled = false;
+      }
+    };
+
+    // PAGE 2: Upload Files & Save Firestore Partner Profile
+    window.handleProfileSubmit = async function(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById("submitProfileBtn");
+      btn.innerText = "Uploading documents & saving...";
+      btn.disabled = true;
+
+      try {
+        const resumeFile = document.getElementById("p2-resume").files[0];
+        const certFile = document.getElementById("p2-certificate").files[0];
+
+        if (!resumeFile || !certFile) {
+          showAlert("Please attach both your resume and inter certificate.", true);
+          btn.innerText = "Submit Details & Continue";
+          btn.disabled = false;
+          return;
+        }
+
+        // Upload Resume to Firebase Storage
+        const resumeRef = ref(storage, `resumes/${currentUserUid}_${Date.now()}_${resumeFile.name}`);
+        await uploadBytes(resumeRef, resumeFile);
+        const resumeUrl = await getDownloadURL(resumeRef);
+
+        // Upload Certificate to Firebase Storage
+        const certRef = ref(storage, `certificates/${currentUserUid}_${Date.now()}_${certFile.name}`);
+        await uploadBytes(certRef, certFile);
+        const certUrl = await getDownloadURL(certRef);
+
+        // Construct Partner Data
+        const profileData = {
+          uid: currentUserUid,
+          fullName: document.getElementById("p2-fullname").value.trim(),
+          age: parseInt(document.getElementById("p2-age").value),
+          phone: document.getElementById("p2-phone").value.trim(),
+          email: document.getElementById("p2-email").value.trim(),
+          dob: document.getElementById("p2-dob").value,
+          interPassYear: document.getElementById("p2-interyear").value,
+          city: document.getElementById("p2-city").value.trim(),
+          district: document.getElementById("p2-district").value.trim(),
+          state: document.getElementById("p2-state").value.trim(),
+          pincode: document.getElementById("p2-pincode").value.trim(),
+          resumeUrl: resumeUrl,
+          certificateUrl: certUrl,
+          status: "pending_payment",
+          createdAt: new Date().toISOString()
+        };
+
+        // Save into Firestore under "partners" collection with UID key
+        await setDoc(doc(db, "partners", currentUserUid), profileData);
+
+        showAlert("Profile saved successfully! Proceeding to payment scanner.");
+
+        // Transition to Page 3
+        setStep(3);
+        document.getElementById("page2").classList.add("hidden");
+        document.getElementById("page3").classList.remove("hidden");
+
+      } catch (err) {
+        console.error("Firestore / Storage Error:", err);
+        showAlert("Failed to save details: " + err.message, true);
+        btn.innerText = "Submit Details & Continue";
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>
