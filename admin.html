@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Telecom Partner Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Top Header Navigation -->
+  <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Admin Portal</h1>
+          <p class="text-xs text-slate-400">Telecom Partner Management System</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- Open Create User Modal Button -->
+        <button onclick="openCreateUserModal()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 transition duration-150 flex items-center space-x-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Create New User</span>
+        </button>
+
+        <!-- CSV Export Button -->
+        <button onclick="exportToCSV()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 transition duration-150 flex items-center space-x-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+    
+    <!-- Stats Overview Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-lg">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Partners</span>
+        <p id="stat-total" class="text-3xl font-bold text-white mt-2">0</p>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-lg">
+        <span class="text-xs font-semibold uppercase tracking-wider text-amber-400">Pending Payment</span>
+        <p id="stat-pending" class="text-3xl font-bold text-amber-400 mt-2">0</p>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-lg">
+        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Approved</span>
+        <p id="stat-approved" class="text-3xl font-bold text-emerald-400 mt-2">0</p>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-lg">
+        <span class="text-xs font-semibold uppercase tracking-wider text-rose-400">Rejected</span>
+        <p id="stat-rejected" class="text-3xl font-bold text-rose-400 mt-2">0</p>
+      </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 mb-6 shadow-lg flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div class="w-full md:w-96 relative">
+        <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search by Name, Email, Phone, or City..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+      </div>
+
+      <div class="w-full md:w-auto flex items-center space-x-3">
+        <label class="text-xs font-medium text-slate-400 shrink-0">Filter Status:</label>
+        <select id="statusFilter" onchange="filterTable()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+          <option value="ALL">All Statuses</option>
+          <option value="pending_payment">Pending Payment</option>
+          <option value="verified">Verified</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Partners Data Table -->
+    <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-900/60 border-b border-slate-700 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+              <th class="py-3.5 px-4">Partner Info</th>
+              <th class="py-3.5 px-4">Contact</th>
+              <th class="py-3.5 px-4">Location</th>
+              <th class="py-3.5 px-4">Inter Year</th>
+              <th class="py-3.5 px-4">Uploaded Docs</th>
+              <th class="py-3.5 px-4">Status</th>
+              <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="partnersTableBody" class="divide-y divide-slate-700/50 text-sm text-slate-300">
+            <tr>
+              <td colspan="7" class="py-12 text-center text-slate-500 font-medium">
+                Loading registered partners...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= CREATE USER MODAL ================= -->
+  <div id="createUserModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-xl w-full p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <h3 class="text-lg font-bold text-white">Create New User Account</h3>
+        <button onclick="closeCreateUserModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="createUserForm" onsubmit="handleCreateUserSubmit(event)" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Full Name *</label>
+            <input type="text" id="admin-fullname" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Rahul Sharma" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Phone Number *</label>
+            <input type="tel" id="admin-phone" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="9876543210" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address *</label>
+            <input type="email" id="admin-email" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="user@example.com" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password *</label>
+            <input type="text" id="admin-password" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Min 6 characters" minlength="6" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Age</label>
+            <input type="number" id="admin-age" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 22">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Inter Pass Year</label>
+            <input type="number" id="admin-interyear" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 2022">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">City</label>
+            <input type="text" id="admin-city" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="City">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">District</label>
+            <input type="text" id="admin-district" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="District">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">State</label>
+            <input type="text" id="admin-state" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="State">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Initial Status</label>
+            <select id="admin-status" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="approved">Approved</option>
+              <option value="pending_payment">Pending Payment</option>
+              <option value="verified">Verified</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-3">
+          <button type="button" onclick="closeCreateUserModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-700">Cancel</button>
+          <button type="submit" id="adminCreateBtn" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20">Create Account & Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="max-w-7xl w-full mx-auto px-4 py-6 text-center text-xs text-slate-500 border-t border-slate-800">
+    © 2026 Telecom Quick Helping Partner Admin Dashboard.
+  </footer>
+
+  <!-- Firebase Modular JS SDK v10 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuzGDHhswMaDnRCbIySk5xrCl8o8mlGLw",
+      authDomain: "telecom-aace9.firebaseapp.com",
+      projectId: "telecom-aace9",
+      storageBucket: "telecom-aace9.firebasestorage.app",
+      messagingSenderId: "443593352045",
+      appId: "1:443593352045:web:2ea6d21fcc722562b8f064",
+      measurementId: "G-CPGWZXSLTQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let allPartnersData = [];
+
+    // Modal Controls
+    window.openCreateUserModal = function() {
+      document.getElementById("createUserModal").classList.remove("hidden");
+    };
+
+    window.closeCreateUserModal = function() {
+      document.getElementById("createUserModal").classList.add("hidden");
+      document.getElementById("createUserForm").reset();
+    };
+
+    // Direct Real-time Firestore Listener
+    function listenToPartners() {
+      const tbody = document.getElementById("partnersTableBody");
+      const partnersCollection = collection(db, "partners");
+
+      onSnapshot(partnersCollection, (snapshot) => {
+        allPartnersData = [];
+        snapshot.forEach((docSnap) => {
+          allPartnersData.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        updateDashboardStats(allPartnersData);
+
+        if (allPartnersData.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="py-12 text-center text-slate-500 font-medium">
+                No registered partners found in database. Click "Create New User" to add one.
+              </td>
+            </tr>
+          `;
+        } else {
+          filterTable();
+        }
+      }, (error) => {
+        console.error("Firestore Listener Error:", error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-rose-400 font-medium">
+              <div class="text-base font-semibold mb-1">Database Access Error</div>
+              <div class="text-xs text-slate-400">${error.message}</div>
+              <div class="text-xs text-amber-400 mt-2">Please update your Firestore Rules to allow read access.</div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Update Statistics
+    function updateDashboardStats(data) {
+      document.getElementById("stat-total").innerText = data.length;
+      document.getElementById("stat-pending").innerText = data.filter(p => p.status === 'pending_payment').length;
+      document.getElementById("stat-approved").innerText = data.filter(p => p.status === 'approved').length;
+      document.getElementById("stat-rejected").innerText = data.filter(p => p.status === 'rejected').length;
+    }
+
+    // Filter & Search Table
+    window.filterTable = function() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+      const statusFilter = document.getElementById("statusFilter").value;
+
+      const filtered = allPartnersData.filter(partner => {
+        const matchesSearch = 
+          (partner.fullName || '').toLowerCase().includes(searchTerm) ||
+          (partner.email || '').toLowerCase().includes(searchTerm) ||
+          (partner.phone || '').toLowerCase().includes(searchTerm) ||
+          (partner.city || '').toLowerCase().includes(searchTerm);
+
+        const matchesStatus = statusFilter === 'ALL' || partner.status === statusFilter;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      renderTable(filtered);
+    };
+
+    function renderTable(partners) {
+      const tbody = document.getElementById("partnersTableBody");
+
+      if (partners.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-slate-500 font-medium">
+              No matching records found.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = partners.map(partner => {
+        const statusColors = {
+          pending_payment: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+          verified: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+          approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+          rejected: 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+        };
+
+        const statusBadgeClass = statusColors[partner.status] || 'bg-slate-700 text-slate-300';
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4">
+              <div class="font-semibold text-white">${partner.fullName || 'N/A'}</div>
+              <div class="text-xs text-slate-400">Age: ${partner.age || 'N/A'}</div>
+            </td>
+            <td class="py-3.5 px-4 text-xs">
+              <div class="text-slate-200">${partner.email || 'N/A'}</div>
+              <div class="text-slate-400">${partner.phone || 'N/A'}</div>
+            </td>
+            <td class="py-3.5 px-4 text-xs">
+              <div class="text-slate-200">${partner.city || 'N/A'}, ${partner.district || ''}</div>
+              <div class="text-slate-400">${partner.state || ''} ${partner.pincode ? '- ' + partner.pincode : ''}</div>
+            </td>
+            <td class="py-3.5 px-4 text-xs text-slate-300">
+              ${partner.interPassYear || 'N/A'}
+            </td>
+            <td class="py-3.5 px-4 text-xs">
+              <div class="flex flex-col space-y-1">
+                ${partner.resumeUrl ? `<a href="${partner.resumeUrl}" target="_blank" class="text-indigo-400 hover:underline">📄 Resume</a>` : '<span class="text-slate-500">No Resume</span>'}
+                ${partner.certificateUrl ? `<a href="${partner.certificateUrl}" target="_blank" class="text-indigo-400 hover:underline">🎓 Certificate</a>` : '<span class="text-slate-500">No Cert</span>'}
+              </div>
+            </td>
+            <td class="py-3.5 px-4">
+              <span class="inline-block border px-2.5 py-1 rounded-lg text-[11px] font-semibold uppercase tracking-wider ${statusBadgeClass}">
+                ${(partner.status || 'pending').replace('_', ' ')}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <select onchange="updatePartnerStatus('${partner.id}', this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-2 py-1 text-slate-200 outline-none focus:border-indigo-500">
+                <option value="pending_payment" ${partner.status === 'pending_payment' ? 'selected' : ''}>Pending Payment</option>
+                <option value="verified" ${partner.status === 'verified' ? 'selected' : ''}>Verified</option>
+                <option value="approved" ${partner.status === 'approved' ? 'selected' : ''}>Approved</option>
+                <option value="rejected" ${partner.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Update Partner Status
+    window.updatePartnerStatus = async function(partnerId, newStatus) {
+      try {
+        const partnerRef = doc(db, "partners", partnerId);
+        await updateDoc(partnerRef, {
+          status: newStatus,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (err) {
+        console.error("Error updating status:", err);
+        alert("Failed to update status: " + err.message);
+      }
+    };
+
+    // Create Account Handler
+    window.handleCreateUserSubmit = async function(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById("adminCreateBtn");
+      btn.innerText = "Creating Account...";
+      btn.disabled = true;
+
+      const email = document.getElementById("admin-email").value.trim();
+      const password = document.getElementById("admin-password").value;
+      const fullName = document.getElementById("admin-fullname").value.trim();
+      const phone = document.getElementById("admin-phone").value.trim();
+      const age = document.getElementById("admin-age").value;
+      const interPassYear = document.getElementById("admin-interyear").value;
+      const city = document.getElementById("admin-city").value.trim();
+      const district = document.getElementById("admin-district").value.trim();
+      const state = document.getElementById("admin-state").value.trim();
+      const status = document.getElementById("admin-status").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const newUid = userCredential.user.uid;
+
+        const profileData = {
+          uid: newUid,
+          fullName: fullName,
+          phone: phone,
+          email: email,
+          age: age ? parseInt(age) : null,
+          interPassYear: interPassYear || "",
+          city: city || "",
+          district: district || "",
+          state: state || "",
+          pincode: "",
+          dob: "",
+          resumeUrl: "",
+          certificateUrl: "",
+          status: status,
+          createdBy: "admin",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        await setDoc(doc(db, "partners", newUid), profileData);
+
+        alert(`Account created successfully!\n\nEmail: ${email}\nPassword: ${password}\n\nThe user can now log in directly on the User Portal.`);
+        closeCreateUserModal();
+
+      } catch (err) {
+        console.error("Error creating user:", err);
+        alert("Failed to create user: " + err.message);
+      } finally {
+        btn.innerText = "Create Account & Profile";
+        btn.disabled = false;
+      }
+    };
+
+    // Export Data to CSV
+    window.exportToCSV = function() {
+      if (allPartnersData.length === 0) {
+        alert("No partner data available to export.");
+        return;
+      }
+
+      const headers = ["UID", "Full Name", "Email", "Phone", "Age", "City", "District", "State", "Inter Pass Year", "Status", "Resume URL", "Certificate URL"];
+      
+      const rows = allPartnersData.map(p => [
+        `"${p.id || ''}"`,
+        `"${p.fullName || ''}"`,
+        `"${p.email || ''}"`,
+        `"${p.phone || ''}"`,
+        `"${p.age || ''}"`,
+        `"${p.city || ''}"`,
+        `"${p.district || ''}"`,
+        `"${p.state || ''}"`,
+        `"${p.interPassYear || ''}"`,
+        `"${p.status || ''}"`,
+        `"${p.resumeUrl || ''}"`,
+        `"${p.certificateUrl || ''}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `telecom_partners_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    // Start listening immediately
+    listenToPartners();
+  </script>
+</body>
+</html>
