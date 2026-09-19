@@ -8,10 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <!-- CryptoJS CDN for SHA-1 Hashing (Required for Cloudinary Signed Uploads) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <!-- Cloudflare Turnstile SDK -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -35,18 +33,10 @@
         <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-800 rounded -z-0"></div>
         <div id="progressLine" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-indigo-500 rounded transition-all duration-500 w-0 -z-0"></div>
 
-        <!-- Step 1 Dot -->
-        <div id="stepDot1" class="relative z-10 w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">
-          1
-        </div>
-        <!-- Step 2 Dot -->
-        <div id="stepDot2" class="relative z-10 w-9 h-9 rounded-full bg-slate-800 text-slate-400 font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">
-          2
-        </div>
-        <!-- Step 3 Dot -->
-        <div id="stepDot3" class="relative z-10 w-9 h-9 rounded-full bg-slate-800 text-slate-400 font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">
-          3
-        </div>
+        <!-- Step Dots -->
+        <div id="stepDot1" class="relative z-10 w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">1</div>
+        <div id="stepDot2" class="relative z-10 w-9 h-9 rounded-full bg-slate-800 text-slate-400 font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">2</div>
+        <div id="stepDot3" class="relative z-10 w-9 h-9 rounded-full bg-slate-800 text-slate-400 font-bold text-sm flex items-center justify-center ring-4 ring-slate-900 shadow-lg transition-all duration-300">3</div>
       </div>
       <div class="flex justify-between text-[11px] font-medium text-slate-400 mt-2 px-1">
         <span>Account Verification</span>
@@ -67,8 +57,6 @@
 
       <!-- ================= PAGE 1 ================= -->
       <section id="page1" class="space-y-6">
-        
-        <!-- Toggle Registration vs Login Header -->
         <div class="flex items-center justify-between border-b border-slate-200 pb-4">
           <div>
             <h2 id="p1-title" class="text-xl font-bold text-slate-900">Step 1: Account Verification</h2>
@@ -81,27 +69,30 @@
 
         <!-- REGISTRATION MODE FORM -->
         <div id="reg-flow" class="space-y-4">
-          
-          <!-- Registration Step 1A: Basic Info Form -->
           <div id="p1-details-step" class="space-y-4">
             <div>
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Full Name *</label>
-              <input type="text" id="p1-name" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="e.g. Satya Kumar" required>
+              <input type="text" id="p1-name" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g. Satya Kumar" required>
             </div>
             <div>
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number *</label>
-              <input type="tel" id="p1-phone" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="e.g. 9876543210" required>
+              <input type="tel" id="p1-phone" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g. 9876543210" required>
             </div>
             <div>
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Address *</label>
-              <input type="email" id="p1-email" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="name@example.com" required>
+              <input type="email" id="p1-email" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="name@example.com" required>
             </div>
+
+            <!-- Cloudflare Turnstile Human Verification Box -->
+            <div class="flex justify-center my-3">
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAAE8-2KXHfXLTB5aI" data-theme="light"></div>
+            </div>
+
             <button id="sendOtpBtn" onclick="handleSendOTP()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200">
               Send OTP to Email
             </button>
           </div>
 
-          <!-- Registration Step 1B: Enter OTP First -->
           <div id="p1-otp-step" class="space-y-4 hidden border-t border-slate-200 pt-5">
             <div class="bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl text-xs text-indigo-800 flex items-center space-x-2">
               <svg class="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -116,7 +107,6 @@
             </button>
           </div>
 
-          <!-- Registration Step 1C: Set Password -->
           <div id="p1-password-step" class="space-y-4 hidden border-t border-emerald-200 pt-5 bg-emerald-50/50 p-4 rounded-xl border">
             <div class="bg-emerald-100 border border-emerald-300 p-3 rounded-xl text-xs text-emerald-900 flex items-center space-x-2">
               <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -124,13 +114,12 @@
             </div>
             <div>
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Create Account Password *</label>
-              <input type="password" id="p1-password" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" placeholder="Minimum 6 characters" minlength="6">
+              <input type="password" id="p1-password" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Minimum 6 characters" minlength="6">
             </div>
             <button id="createAccountBtn" onclick="handleCreateAccountWithPassword()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-200">
               Set Password & Create Account
             </button>
           </div>
-
         </div>
 
         <!-- LOGIN MODE FORM -->
@@ -165,15 +154,15 @@
         <form id="profileForm" onsubmit="handleProfileSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Full Name *</label>
-            <input type="text" id="p2-fullname" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+            <input type="text" id="p2-fullname" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Age *</label>
-            <input type="number" id="p2-age" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" min="18" placeholder="e.g. 24" required>
+            <input type="number" id="p2-age" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" min="18" placeholder="e.g. 24" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number *</label>
-            <input type="tel" id="p2-phone" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+            <input type="tel" id="p2-phone" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Address *</label>
@@ -181,50 +170,60 @@
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Birth *</label>
-            <input type="date" id="p2-dob" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+            <input type="date" id="p2-dob" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Inter Pass Year *</label>
-            <input type="number" id="p2-interyear" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g. 2022" min="1990" max="2026" required>
+            <input type="number" id="p2-interyear" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g. 2022" min="1990" max="2026" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">City *</label>
-            <input type="text" id="p2-city" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="City name" required>
+            <input type="text" id="p2-city" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="City name" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">District *</label>
-            <input type="text" id="p2-district" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="District" required>
+            <input type="text" id="p2-district" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="District" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">State *</label>
-            <input type="text" id="p2-state" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="State" required>
+            <input type="text" id="p2-state" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="State" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Pin Code *</label>
-            <input type="text" id="p2-pincode" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="6-digit PIN code" pattern="[0-9]{6}" required>
+            <input type="text" id="p2-pincode" oninput="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="6-digit PIN code" pattern="[0-9]{6}" required>
           </div>
 
-          <!-- Resume Upload & View Link -->
+          <!-- Resume Upload Box -->
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Resume (PDF / Image)</label>
               <a id="p2-resume-preview" href="#" target="_blank" class="hidden text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 underline">📄 View Uploaded</a>
             </div>
-            <input type="file" id="p2-resume" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer" accept=".pdf,.png,.jpeg,.jpg">
+            <input type="file" id="p2-resume" onchange="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer" accept=".pdf,.png,.jpeg,.jpg">
+            <!-- Uploaded file name badge -->
+            <div id="p2-resume-filename" class="hidden mt-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center space-x-1">
+              <span>📎 Uploaded:</span>
+              <span id="p2-resume-name-txt" class="truncate font-semibold"></span>
+            </div>
           </div>
 
-          <!-- Inter Certificate Upload & View Link -->
+          <!-- Inter Certificate Upload Box -->
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Inter Certificate (PDF / Image)</label>
               <a id="p2-cert-preview" href="#" target="_blank" class="hidden text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 underline">📄 View Uploaded</a>
             </div>
-            <input type="file" id="p2-certificate" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer" accept=".pdf,.png,.jpeg,.jpg">
+            <input type="file" id="p2-certificate" onchange="markFormChanged()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer" accept=".pdf,.png,.jpeg,.jpg">
+            <!-- Uploaded file name badge -->
+            <div id="p2-cert-filename" class="hidden mt-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center space-x-1">
+              <span>📎 Uploaded:</span>
+              <span id="p2-cert-name-txt" class="truncate font-semibold"></span>
+            </div>
           </div>
 
           <div class="md:col-span-2 pt-3 flex flex-col sm:flex-row gap-3">
             <button type="submit" id="submitProfileBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200 flex items-center justify-center space-x-2">
-              <span>Save Details & Proceed to Step 3</span>
+              <span id="btn-text">Proceed to Step 3 →</span>
             </button>
           </div>
         </form>
@@ -237,18 +236,16 @@
             <h2 class="text-xl font-bold text-slate-900">Step 3: Registration Fee Payment</h2>
             <p class="text-xs sm:text-sm text-slate-500">Scan the QR code using any UPI application.</p>
           </div>
-          <!-- Back to Step 2 Button -->
           <button onclick="goToStep2FromStep3()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg transition">
             ← Back & Edit Details
           </button>
         </div>
 
         <div class="flex justify-center my-6">
-          <div class="p-4 bg-white border-2 border-indigo-100 rounded-2xl shadow-xl inline-block relative group">
+          <div class="p-4 bg-white border-2 border-indigo-100 rounded-2xl shadow-xl inline-block relative">
             <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
               Official Scanner
             </div>
-            <!-- Payment Scanner QR Image -->
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=quickhelpingpartner@upi&pn=TelecomQHP&mc=0000&mode=02" alt="Payment QR Scanner" class="w-52 h-52 rounded-lg object-contain">
             <div class="mt-2 text-xs font-bold text-slate-700">Telecom Quick Helping Partner</div>
           </div>
@@ -290,30 +287,23 @@
       measurementId: "G-CPGWZXSLTQ"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // EmailJS Credentials
-    const EMAILJS_PUBLIC_KEY = "6OYyhfesYKGExGDPb";
-    const EMAILJS_SERVICE_ID = "service_qh1c06y";
-    const EMAILJS_TEMPLATE_ID = "template_judy2gg";
-
-    // Cloudinary Credentials
+    // Cloudinary Public Credentials
     const CLOUDINARY_CLOUD_NAME = "htuoyw6l";
     const CLOUDINARY_API_KEY = "193593928595248";
-    const CLOUDINARY_API_SECRET = "bAT107fDGMlAk23sOOdcBJ5lSPM";
 
-    // Initialize EmailJS
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+    // Cloudflare Worker Endpoint
+    const WORKER_URL = "https://telecom.quickhelpingpartner.workers.dev";
 
     // App State Variables
-    let generatedOTP = null;
+    let otpVerificationToken = null;
     let currentUserUid = null;
     let isLoginMode = false;
+    let isFormDirty = false;
 
-    // Helper: Display Alert Banner
     function showAlert(msg, isError = false) {
       const alertBox = document.getElementById("alertBox");
       const alertMsg = document.getElementById("alertMsg");
@@ -334,7 +324,6 @@
       document.getElementById("alertBox").classList.add("hidden");
     }
 
-    // Helper: Update Progress Dots
     function setStep(stepNumber) {
       hideAlert();
       const line = document.getElementById("progressLine");
@@ -358,7 +347,24 @@
       }
     }
 
-    // Populate Step 2 Fields from Firestore Data
+    function getCleanFileName(url) {
+      if (!url) return "";
+      try {
+        const decoded = decodeURIComponent(url);
+        return decoded.split('/').pop().split('?')[0];
+      } catch (e) {
+        return "Uploaded File";
+      }
+    }
+
+    window.markFormChanged = function() {
+      isFormDirty = true;
+      const btnText = document.getElementById("btn-text");
+      if (btnText) {
+        btnText.textContent = "Save Changes & Proceed to Step 3";
+      }
+    };
+
     function fillStep2Fields(data, email) {
       document.getElementById("p2-fullname").value = data.fullName || "";
       document.getElementById("p2-age").value = data.age || "";
@@ -371,33 +377,49 @@
       document.getElementById("p2-state").value = data.state || "";
       document.getElementById("p2-pincode").value = data.pincode || "";
 
-      // Document Preview Links
       const resumeLink = document.getElementById("p2-resume-preview");
-      const certLink = document.getElementById("p2-cert-preview");
+      const resumeBadge = document.getElementById("p2-resume-filename");
+      const resumeTxt = document.getElementById("p2-resume-name-txt");
 
       if (data.resumeUrl) {
         resumeLink.href = data.resumeUrl;
         resumeLink.classList.remove("hidden");
+        resumeTxt.textContent = getCleanFileName(data.resumeUrl);
+        resumeBadge.classList.remove("hidden");
       } else {
         resumeLink.classList.add("hidden");
+        resumeBadge.classList.add("hidden");
       }
+
+      const certLink = document.getElementById("p2-cert-preview");
+      const certBadge = document.getElementById("p2-cert-filename");
+      const certTxt = document.getElementById("p2-cert-name-txt");
 
       if (data.certificateUrl) {
         certLink.href = data.certificateUrl;
         certLink.classList.remove("hidden");
+        certTxt.textContent = getCleanFileName(data.certificateUrl);
+        certBadge.classList.remove("hidden");
       } else {
         certLink.classList.add("hidden");
+        certBadge.classList.add("hidden");
+      }
+
+      isFormDirty = false;
+      const btnText = document.getElementById("btn-text");
+      if (data.resumeUrl && data.certificateUrl) {
+        btnText.textContent = "Proceed to Step 3 →";
+      } else {
+        btnText.textContent = "Save Details & Proceed to Step 3";
       }
     }
 
-    // Navigation: Back to Step 2 from Step 3
     window.goToStep2FromStep3 = function() {
       setStep(2);
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page2").classList.remove("hidden");
     };
 
-    // Logout Handler
     window.handleLogout = async function() {
       try {
         await signOut(auth);
@@ -412,11 +434,20 @@
       }
     };
 
-    // Helper: Fast Direct Upload
+    // Cloudinary Upload Signing
     async function uploadToCloudinary(file, folderName) {
-      const timestamp = Math.round(new Date().getTime() / 1000);
-      const strToSign = `folder=${folderName}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
-      const signature = CryptoJS.SHA1(strToSign).toString();
+      const signResponse = await fetch(`${WORKER_URL}/api/sign-upload`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder: folderName })
+      });
+
+      if (!signResponse.ok) {
+        const err = await signResponse.json();
+        throw new Error(err.error || "Failed to get upload signature from Cloudflare Worker");
+      }
+
+      const { timestamp, signature } = await signResponse.json();
 
       const formData = new FormData();
       formData.append("file", file);
@@ -425,21 +456,20 @@
       formData.append("folder", folderName);
       formData.append("signature", signature);
 
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
         method: "POST",
         body: formData
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error?.message || "Failed to upload file");
+      if (!uploadResponse.ok) {
+        const errData = await uploadResponse.json();
+        throw new Error(errData.error?.message || "Failed to upload file to Cloudinary");
       }
 
-      const data = await response.json();
+      const data = await uploadResponse.json();
       return data.secure_url;
     }
 
-    // Toggle Auth Mode
     window.toggleAuthMode = function() {
       hideAlert();
       isLoginMode = !isLoginMode;
@@ -464,8 +494,8 @@
       }
     };
 
-    // PAGE 1: Send OTP
-    window.handleSendOTP = function() {
+    // OTP Dispatch with Turnstile Human Verification
+    window.handleSendOTP = async function() {
       const name = document.getElementById("p1-name").value.trim();
       const phone = document.getElementById("p1-phone").value.trim();
       const email = document.getElementById("p1-email").value.trim();
@@ -475,52 +505,88 @@
         return;
       }
 
-      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      // Read verification token from Cloudflare Turnstile widget
+      const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value || "";
+      if (!turnstileToken) {
+        showAlert("Please complete the security check before sending OTP.", true);
+        return;
+      }
 
       const btn = document.getElementById("sendOtpBtn");
       btn.innerText = "Sending OTP...";
       btn.disabled = true;
 
-      const templateParams = {
-        email: email,
-        to_name: name,
-        otp: generatedOTP
-      };
-
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-        .then(() => {
-          showAlert("OTP has been sent successfully to " + email);
-          document.getElementById("p1-details-step").classList.add("hidden");
-          document.getElementById("p1-otp-step").classList.remove("hidden");
-        })
-        .catch((err) => {
-          console.error("EmailJS Error:", err);
-          showAlert("Failed to send OTP email: " + (err.text || JSON.stringify(err)), true);
-          btn.innerText = "Send OTP to Email";
-          btn.disabled = false;
+      try {
+        const response = await fetch(`${WORKER_URL}/api/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, turnstileToken })
         });
+
+        const data = await response.json();
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "Failed to send OTP email.");
+        }
+
+        otpVerificationToken = data.token;
+        showAlert("OTP has been sent successfully to " + email);
+        document.getElementById("p1-details-step").classList.add("hidden");
+        document.getElementById("p1-otp-step").classList.remove("hidden");
+      } catch (err) {
+        showAlert(err.message, true);
+        if (window.turnstile) window.turnstile.reset();
+      } finally {
+        btn.innerText = "Send OTP to Email";
+        btn.disabled = false;
+      }
     };
 
-    // Verify OTP Only
-    window.handleVerifyOTPOnly = function() {
+    // OTP Verification
+    window.handleVerifyOTPOnly = async function() {
       const userOtp = document.getElementById("p1-otp-input").value.trim();
+      const email = document.getElementById("p1-email").value.trim();
 
-      if (!userOtp) {
+      if (!userOtp || userOtp.length !== 6) {
         showAlert("Please enter the 6-digit OTP code sent to your email.", true);
         return;
       }
 
-      if (userOtp !== generatedOTP) {
-        showAlert("Invalid OTP code. Please check your email and try again.", true);
+      if (!otpVerificationToken) {
+        showAlert("Session expired. Please request a new OTP.", true);
         return;
       }
 
-      showAlert("OTP Verified! Now please set your password below.");
-      document.getElementById("p1-otp-step").classList.add("hidden");
-      document.getElementById("p1-password-step").classList.remove("hidden");
+      const btn = document.getElementById("verifyOtpBtn");
+      btn.innerText = "Verifying...";
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(`${WORKER_URL}/api/verify-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email,
+            otp: userOtp,
+            token: otpVerificationToken
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.verified) {
+          throw new Error(data.message || "Invalid or expired OTP code.");
+        }
+
+        showAlert("OTP Verified! Now please set your password below.");
+        document.getElementById("p1-otp-step").classList.add("hidden");
+        document.getElementById("p1-password-step").classList.remove("hidden");
+      } catch (err) {
+        showAlert(err.message, true);
+      } finally {
+        btn.innerText = "Verify OTP";
+        btn.disabled = false;
+      }
     };
 
-    // Create Account with Password
     window.handleCreateAccountWithPassword = async function() {
       const password = document.getElementById("p1-password").value;
       const email = document.getElementById("p1-email").value.trim();
@@ -546,6 +612,9 @@
         document.getElementById("p2-phone").value = phone;
         document.getElementById("p2-email").value = email;
 
+        isFormDirty = true;
+        document.getElementById("btn-text").textContent = "Save Details & Proceed to Step 3";
+
         setStep(2);
         document.getElementById("page1").classList.add("hidden");
         document.getElementById("page2").classList.remove("hidden");
@@ -558,7 +627,6 @@
       }
     };
 
-    // LOGIN HANDLER: Sign In & Load Existing Saved Details
     window.handleAccountLogin = async function() {
       const email = document.getElementById("login-email").value.trim();
       const password = document.getElementById("login-password").value;
@@ -578,23 +646,21 @@
 
         showAlert("Logged in successfully!");
 
-        // Fetch user document from Firestore
         const partnerDocRef = doc(db, "partners", currentUserUid);
         const partnerSnap = await getDoc(partnerDocRef);
 
         if (partnerSnap.exists()) {
           const data = partnerSnap.data();
           fillStep2Fields(data, email);
-
-          setStep(2);
-          document.getElementById("page1").classList.add("hidden");
-          document.getElementById("page2").classList.remove("hidden");
         } else {
           document.getElementById("p2-email").value = email;
-          setStep(2);
-          document.getElementById("page1").classList.add("hidden");
-          document.getElementById("page2").classList.remove("hidden");
+          isFormDirty = true;
+          document.getElementById("btn-text").textContent = "Save Details & Proceed to Step 3";
         }
+
+        setStep(2);
+        document.getElementById("page1").classList.add("hidden");
+        document.getElementById("page2").classList.remove("hidden");
 
       } catch (err) {
         console.error("Login Error:", err);
@@ -605,9 +671,15 @@
       }
     };
 
-    // PAGE 2: Upload / Update Details & Save to Firestore (Fast Parallel Upload)
     window.handleProfileSubmit = async function(e) {
       e.preventDefault();
+
+      if (!isFormDirty) {
+        setStep(3);
+        document.getElementById("page2").classList.add("hidden");
+        document.getElementById("page3").classList.remove("hidden");
+        return;
+      }
 
       const btn = document.getElementById("submitProfileBtn");
       btn.disabled = true;
@@ -616,7 +688,7 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span>Processing & Saving Details...</span>
+        <span>Saving & Uploading...</span>
       `;
 
       try {
@@ -634,7 +706,6 @@
           certUrl = existingDoc.data().certificateUrl || "";
         }
 
-        // Fast Parallel Uploads using Promise.all
         const uploadPromises = [];
 
         if (resumeFile) {
@@ -650,7 +721,7 @@
 
         if (!resumeUrl || !certUrl) {
           showAlert("Please attach both your resume and inter certificate.", true);
-          btn.innerHTML = `<span>Save Details & Proceed to Step 3</span>`;
+          btn.innerHTML = `<span id="btn-text">Save Changes & Proceed to Step 3</span>`;
           btn.disabled = false;
           return;
         }
@@ -673,13 +744,11 @@
           updatedAt: new Date().toISOString()
         };
 
-        // Merge and save into Firestore
         await setDoc(doc(db, "partners", currentUserUid), profileData, { merge: true });
 
-        // Update preview links on UI
         fillStep2Fields(profileData, profileData.email);
 
-        showAlert("Profile saved successfully! Proceeding to payment scanner.");
+        showAlert("Profile updated successfully! Proceeding to payment scanner.");
 
         setStep(3);
         document.getElementById("page2").classList.add("hidden");
@@ -689,7 +758,7 @@
         console.error("Error:", err);
         showAlert("Failed to save details: " + err.message, true);
       } finally {
-        btn.innerHTML = `<span>Save Details & Proceed to Step 3</span>`;
+        btn.innerHTML = `<span id="btn-text">Proceed to Step 3 →</span>`;
         btn.disabled = false;
       }
     };
